@@ -1,5 +1,6 @@
 import { IsEmail, Length } from "class-validator";
 import { addEmitHelpers } from "typescript";
+import bcrypt from 'bcrypt';
 
 class userDTO {
   constructor(
@@ -12,10 +13,22 @@ class userDTO {
     this.senha = obj.senha
   }
   @IsEmail( {}, {message:"formato do campo email é invalido"} )
-  email: string;
+  readonly email: string;
 
   @Length(10, 50, {message:"sua senha deve conter entre 10 e 50 caracteres"})
-  senha: string;
-};
+  private senha: string;
+
+  encryptaSenha() {
+    this.senha = bcrypt.hashSync(this.senha, 15)
+  }
+
+  compara(senha:string) {
+    return bcrypt.compareSync(senha, this.senha)
+  }
+
+  senhaGetter() {
+    return this.senha
+  }
+}; 
 
 export { userDTO };
